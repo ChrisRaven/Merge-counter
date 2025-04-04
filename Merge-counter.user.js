@@ -32,18 +32,30 @@
       const header = container.querySelector('.' + HEADER_CLASS)
       if (!header) return
 
-      let originalText = header.getAttribute(ORIGINAL_TEXT_DATA_ATTR)
-      if (originalText === null) {
-        originalText = header.textContent.replace(/\s*\(\d+\)\s*$/, '').trim()
-        header.setAttribute(ORIGINAL_TEXT_DATA_ATTR, originalText)
-      }
+      const currentFullText = header.textContent
+      const currentBaseText = currentFullText.replace(/\s*\(\d+\)\s*$/, '').trim()
 
-      const count = container.querySelectorAll('.' + TARGET_ITEM_CLASS).length
-      const newText = `${originalText || ''} (${count})`
+      const conditionMet = currentBaseText.startsWith(REQUIRED_PREFIX)
 
-      if (header.textContent !== newText) {
-        header.textContent = newText;
+      if (conditionMet) {
+        header.setAttribute(ORIGINAL_TEXT_DATA_ATTR, currentBaseText)
+
+        const count = container.querySelectorAll('.' + TARGET_ITEM_CLASS).length
+        const newText = `${currentBaseText} (${count})`
+
+        if (header.textContent !== newText) {
+          header.textContent = newText
+        }
       } else {
+        const storedOriginal = header.getAttribute(ORIGINAL_TEXT_DATA_ATTR)
+
+        if (storedOriginal !== null) {
+          header.removeAttribute(ORIGINAL_TEXT_DATA_ATTR)
+
+          if (header.textContent !== currentBaseText) {
+            header.textContent = currentBaseText
+          }
+        }
       }
     }, DEBOUNCE_DELAY)
   }
