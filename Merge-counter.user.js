@@ -18,6 +18,7 @@
   const HEADER_CLASS = 'neuroglancer-tool-status-header'
   const TARGET_ITEM_CLASS = 'graphene-merge-segments-submission'
   const ORIGINAL_TEXT_DATA_ATTR = 'data-original-status-text'
+  const REQUIRED_PREFIX = 'Merge segments'
 
   let debounceTimeout;
   const DEBOUNCE_DELAY = 50
