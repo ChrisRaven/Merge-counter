@@ -12,70 +12,51 @@
 // ==/UserScript==
 
 (function() {
-  'use strict';
+  'use strict'
 
-  const CONTAINER_ID = 'neuroglancer-status-container';
-  const HEADER_CLASS = 'neuroglancer-tool-status-header';
-  const TARGET_ITEM_CLASS = 'graphene-merge-segments-submission';
-  const ORIGINAL_TEXT_DATA_ATTR = 'data-original-status-text'; // Custom data attribute
+  const CONTAINER_ID = 'neuroglancer-status-container'
+  const HEADER_CLASS = 'neuroglancer-tool-status-header'
+  const TARGET_ITEM_CLASS = 'graphene-merge-segments-submission'
+  const ORIGINAL_TEXT_DATA_ATTR = 'data-original-status-text'
 
-  // --- Debounce updateCount slightly ---
-  // Although the check below prevents infinite loops, debouncing can
-  // slightly improve performance if many mutations happen in quick succession.
-  // Adjust the delay (in ms) as needed, or remove if not desired.
   let debounceTimeout;
-  const DEBOUNCE_DELAY = 50; // milliseconds
+  const DEBOUNCE_DELAY = 50
 
   function updateCount() {
-    // Clear any pending timeout to prevent multiple updates close together
-    clearTimeout(debounceTimeout);
+    clearTimeout(debounceTimeout)
 
     debounceTimeout = setTimeout(() => {
-      const container = document.getElementById(CONTAINER_ID);
-      if (!container) {
-        return;
-      }
+      const container = document.getElementById(CONTAINER_ID)
+      if (!container) return
 
-      const header = container.querySelector('.' + HEADER_CLASS);
-      if (!header) {
-        return;
-      }
+      const header = container.querySelector('.' + HEADER_CLASS)
+      if (!header) return
 
-      let originalText = header.getAttribute(ORIGINAL_TEXT_DATA_ATTR);
+      let originalText = header.getAttribute(ORIGINAL_TEXT_DATA_ATTR)
       if (originalText === null) {
-        originalText = header.textContent.replace(/\s*\(\d+\)\s*$/, '').trim();
-        header.setAttribute(ORIGINAL_TEXT_DATA_ATTR, originalText);
+        originalText = header.textContent.replace(/\s*\(\d+\)\s*$/, '').trim()
+        header.setAttribute(ORIGINAL_TEXT_DATA_ATTR, originalText)
       }
 
-      const count = container.querySelectorAll('.' + TARGET_ITEM_CLASS).length;
-      const newText = `${originalText || ''} (${count})`;
+      const count = container.querySelectorAll('.' + TARGET_ITEM_CLASS).length
+      const newText = `${originalText || ''} (${count})`
 
-      // *** THE CRITICAL CHECK TO PREVENT INFINITE LOOPS ***
-      // Only update the text if it's actually different from the current text.
       if (header.textContent !== newText) {
-        // console.log(`Updating header text to: "${newText}"`); // Optional: for debugging
         header.textContent = newText;
       } else {
-        // console.log(`Header text already correct: "${header.textContent}"`); // Optional: for debugging
       }
-    }, DEBOUNCE_DELAY);
+    }, DEBOUNCE_DELAY)
   }
 
-  // --- MutationObserver Setup ---
   const observer = new MutationObserver((mutationsList, observer) => {
-    // Call the debounced update function on any relevant DOM change.
-    updateCount();
+    updateCount()
   });
 
-  // Start observing the document body
   observer.observe(document.body, {
     childList: true,
     subtree: true
-  });
+  })
 
-  // --- Initial Check ---
-  updateCount();
+  updateCount()
 
-  console.log('Neuroglancer Submission Counter script loaded (v1.2 - loop prevention).');
-
-})();
+})()
